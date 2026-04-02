@@ -1,0 +1,2 @@
+flt12_test_passed,flt12_assertion_test_passed,flt12_deassertion_test_passed,flt12_initial_voltage,flt12_assert_pin_voltage,lt12_assert_ps_voltage
+False,True,False,13.9589264,13.959904,-10.0023

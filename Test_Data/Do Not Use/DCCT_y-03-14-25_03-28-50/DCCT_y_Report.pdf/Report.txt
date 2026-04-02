@@ -1,0 +1,1 @@
+Testing stopped or skipped mid-cycle. Data invalidated.
