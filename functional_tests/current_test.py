@@ -88,13 +88,13 @@ def init_scope_ct(scope):
     # ADD TRIGGER CONFIG............................................................
     # ........................................................................
     # .........................................................
-    for i in range(1, 4):  # Iterate through settings for Channel 1 through 4 identically...
+    for i in (1, 3):  # Iterate through settings for Channel 1 through 4 identically...
         scope.bandwidth(str(i), "FULL")
         scope.coupling(str(i), "DC")
         scope.deskew(str(i))
         scope.invert(str(i))
         scope.vertical_position(str(i))
-    scope.vertical_position("4", "-5")
+    # scope.vertical_position("4", "-5")
 
 
 def gen_init_ct(gen):
@@ -128,7 +128,7 @@ def acquire_wfdata(scope):
     # scope.measurement_gating("SCREEN")
 
     channel_data = {}
-    for i in range(1, 4):
+    for i in (1, 3):
         j = str(i)
 
         ymult, yzero, yoff, xincr, data = scope.acquire_waveform((j), "1", "RPB")
@@ -146,7 +146,7 @@ def acquire_wfdata(scope):
 def decode_wfdata(channel_data):
     """Decode waveform data"""
     decoded_wfdata = {}
-    for i in range(1, 4):
+    for i in (1, 3):
         data = channel_data[i]["data"]
         headerlen = 2 + int(data[1])  # Access the second byte in the raw wfdata
         header = data[:headerlen]

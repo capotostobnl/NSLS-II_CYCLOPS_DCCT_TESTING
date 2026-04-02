@@ -119,10 +119,8 @@ def plot_pdf(dut_info, report_path, plot_path):
         # "Current Overall Testing": ,
         "CT Measurement Overall Testing": (dut_info['current_test_freq_phase_pass'] 
                                            and dut_info['current_test_ch1_threshold']
-                                           and dut_info['current_test_ch2_threshold']
                                            and dut_info['current_test_ch3_threshold']),
         "Channel 1 Voltage Threshold": (f"{dut_info['current_test_vpp1']}Vpp", dut_info['current_test_ch1_threshold']),
-        "Channel 2 Voltage Threshold": (f"{dut_info['current_test_vpp2']}Vpp", dut_info['current_test_ch2_threshold']),
         "Channel 3 Voltage Threshold": (f"{dut_info['current_test_vpp3']}Vpp", dut_info['current_test_ch3_threshold']),
         "Frequency and Phase": (freq_phase, dut_info['current_test_freq_phase_pass']),
     }

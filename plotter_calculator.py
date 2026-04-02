@@ -24,19 +24,17 @@ MIN_PK_PK = 0.5  # Minimum measured PK-to-PK Voltage
 def init_plots():
     """Initialize plots"""
     # Create a plot figure with 4 plots, for CHA, CHB, CHC, CH AB.
-    f, ax = plt.subplots(2, 2)
-    f.set_figheight(12)
-    f.set_figwidth(12)
+    f, ax = plt.subplots(1, 3)
+    f.set_figheight(6)
+    f.set_figwidth(18)
     f.suptitle("ALSu DCCT Test Data")
     return f, ax
 
 
 def clear_plots(ax):
     """Clear old data off plots..."""
-    ax[0, 0].clear()
-    ax[1, 0].clear()
-    ax[0, 1].clear()
-    ax[1, 1].clear()
+    for i in range(3):
+        ax[i].clear()
 
 
 def calculate_frequency(volts):
@@ -71,7 +69,7 @@ def calculate_phase_shift(volts):
 
     # Perform FFT on both Channel 1 and Channel 2 signals
     fft_ch1 = np.fft.fft(volts[1])
-    fft_ch2 = np.fft.fft(volts[2])
+    fft_ch3 = np.fft.fft(volts[3])
 
     # Get the index corresponding to the peak frequency
     # (same frequency for both channels)
@@ -86,10 +84,10 @@ def calculate_phase_shift(volts):
 
     # Find the phase at the peak frequency
     phase_ch1 = np.angle(fft_ch1[peak_freq_idx])
-    phase_ch2 = np.angle(fft_ch2[peak_freq_idx])
+    phase_ch3 = np.angle(fft_ch3[peak_freq_idx])
 
     # Calculate the phase shift in degrees
-    phase_shift = np.degrees(phase_ch2 - phase_ch1)  # Phase shift between
+    phase_shift = np.degrees(phase_ch3 - phase_ch1)  # Phase shift between
     # Channel 2 and Channel 1
     if phase_shift < 0:
         phase_shift += 360  # Ensure phase is
@@ -105,7 +103,7 @@ def unpack_raw_adc(channel_data, decoded_wfdata):
     ymax = {}
     ymin = {}
 
-    for i in range(1, 4):  # Loop over channels 1 to 4
+    for i in (1, 3):  # Loop over channels 1 to 4
         adc_wave = np.array(unpack(f"{len(decoded_wfdata[i]['adc_wave'])}B",
                                    decoded_wfdata[i]['adc_wave']))
 
@@ -122,60 +120,44 @@ def unpack_raw_adc(channel_data, decoded_wfdata):
 def plot_waveforms(channel_data, decoded_wfdata, plot_filename):
     """Generate four plots with waveforms and additional info."""
     # Initialize all return variables
-    ch1_threshold = ch2_threshold = ch3_threshold = False
+    ch1_threshold = ch3_threshold = False
     freq_phase_pass = False
-    vpp1 = vpp2 = vpp3 = 0
+    vpp1 = vpp3 = 0
     frequency = phase_shift = 0
     f, ax = init_plots()
     clear_plots(ax)
     volts, ymax, ymin, scope_time = unpack_raw_adc(channel_data, decoded_wfdata)
 
     # Plot Channel 1
-    ax[0, 0].plot(scope_time, volts[1], label="Channel 1")
-    ax[0, 0].set_title("Channel 1, IOUT 1")
-    ax[0, 0].grid(True)
-    ax[0, 0].text(0.05, 0.9, f"Peak-to-Peak: {round(ymax[1] - ymin[1], 3)} V",
-                  transform=ax[0, 0].transAxes, fontsize=14, verticalalignment='top',
-                  bbox={'facecolor': 'wheat', 'alpha': 0.7})
+    ax[0].plot(scope_time, volts[1], label="Channel 1")
+    ax[0].set_title("Channel 1, IOUT 1")
+    ax[0].grid(True)
+    ax[0].text(0.05, 0.9, f"Peak-to-Peak: {round(ymax[1] - ymin[1], 3)} V",
+               transform=ax[0].transAxes, fontsize=14, verticalalignment='top',
+               bbox={'facecolor': 'wheat', 'alpha': 0.7})
     vpp = ymax[1] - ymin[1]
     vpp1 = ymax[1] - ymin[1]
     if 0.50 <= vpp <= 0.54:  # Set Pass/Fail Tolerance
-        ax[0, 0].set_facecolor((0, 1, 0, 0.2))  # Green with 50% alpha
+        ax[0].set_facecolor((0, 1, 0, 0.2))  # Green with 50% alpha
         ch1_threshold = True
     else:
-        ax[0, 0].set_facecolor((1, 0, 0, 0.2))  # Red with 50% alpha
+        ax[0].set_facecolor((1, 0, 0, 0.2))  # Red with 50% alpha
         ch1_threshold = False
 
-    # Plot Channel 2
-    ax[0, 1].plot(scope_time, volts[2], label="Channel 2")
-    ax[0, 1].set_title("Channel 2, IOUT 2")
-    ax[0, 1].grid(True)
-    ax[0, 1].text(0.05, 0.9, f"Peak-to-Peak: {round(ymax[2] - ymin[2], 3)} V",
-                  transform=ax[0, 1].transAxes, fontsize=14, verticalalignment='top',
-                  bbox=dict(facecolor='wheat', alpha=0.7))
-    vpp = ymax[2] - ymin[2]  # Set Pass/Fail Tolerance
-    vpp2 = ymax[2] - ymin[2]
-    if 0.50 <= vpp <= 0.54:
-        ax[0, 1].set_facecolor((0, 1, 0, 0.2))  # Green with 50% alpha
-        ch2_threshold = True
-    else:
-        ax[0, 1].set_facecolor((1, 0, 0, 0.2))  # Red with 50% alpha
-        ch2_threshold = False
-
     # Plot Channel 3
-    ax[1, 0].plot(scope_time, volts[3], label="Channel 3")
-    ax[1, 0].set_title("Channel 3, SIGNAL GEN")
-    ax[1, 0].grid(True)
-    ax[1, 0].text(0.05, 0.9, f"Peak-to-Peak: {round(ymax[3] - ymin[3], 3)} V",
-                  transform=ax[1, 0].transAxes, fontsize=14, verticalalignment='top',
-                  bbox={'facecolor': 'wheat', 'alpha': 0.7})
+    ax[1].plot(scope_time, volts[3], label="Channel 3")
+    ax[1].set_title("Channel 3, SIGNAL GEN")
+    ax[1].grid(True)
+    ax[1].text(0.05, 0.9, f"Peak-to-Peak: {round(ymax[3] - ymin[3], 3)} V",
+               transform=ax[1].transAxes, fontsize=14, verticalalignment='top',
+               bbox={'facecolor': 'wheat', 'alpha': 0.7})
     vpp = ymax[3] - ymin[3]  # Set Pass/Fail Tolerance
     vpp3 = ymax[3] - ymin[3]
     if 20 <= vpp <= 22:
-        ax[1, 0].set_facecolor((0, 1, 0, 0.2))  # Green with 50% alpha
+        ax[1].set_facecolor((0, 1, 0, 0.2))  # Green with 50% alpha
         ch3_threshold = True
     else:
-        ax[1, 0].set_facecolor((1, 0, 0, 0.2))  # Red with 50% alpha
+        ax[1].set_facecolor((1, 0, 0, 0.2))  # Red with 50% alpha
         ch3_threshold = False
 
     # Calculate Phase Shift between Channel 1 and Channel 2
@@ -204,8 +186,8 @@ def plot_waveforms(channel_data, decoded_wfdata, plot_filename):
 
     plt.tight_layout()
     plt.show()
-    return plot_filename, ch1_threshold, ch2_threshold, ch3_threshold, \
-        frequency, phase_shift, freq_phase_pass, vpp1, vpp2, vpp3
+    return plot_filename, ch1_threshold, ch3_threshold, \
+        frequency, phase_shift, freq_phase_pass, vpp1, vpp3
 
 
 if __name__ == "__main__":

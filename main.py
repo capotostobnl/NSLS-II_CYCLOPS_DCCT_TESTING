@@ -336,13 +336,11 @@ def generate_report_dataset():
         "dcct_sn_raw": dcct_sn_raw,
         "flt12_test_current": fault_test_results["test_current"],
         "current_test_ch1_threshold": ch1_threshold,
-        "current_test_ch2_threshold": ch2_threshold,
         "current_test_ch3_threshold": ch3_threshold,
         "current_test_frequency": frequency,
         "current_test_phase_shift": phase_shift,
         "current_test_freq_phase_pass": freq_phase_pass,
         "current_test_vpp1": vpp1,
-        "current_test_vpp2": vpp2,
         "current_test_vpp3": vpp3
     }
     return dut_info_l
@@ -407,8 +405,8 @@ while LOOP_FLAG == 1:
                                            f"waveform_plots_{dcct_sn}"
                                            f"_{dir_time_formatted}.png")
 
-    plot_filename, ch1_threshold, ch2_threshold, ch3_threshold, \
-        frequency, phase_shift, freq_phase_pass, vpp1, vpp2, vpp3 = \
+    plot_filename, ch1_threshold, ch3_threshold, \
+        frequency, phase_shift, freq_phase_pass, vpp1, vpp3 = \
         plot_waveforms(current_channel_data, current_decoded_wfdata,
                        current_plot_filename_l)
 
