@@ -217,7 +217,7 @@ if __name__ == "__main__":
 
     def create_test_directories(dcct_sn, dir_time_formatted):  # pylint: disable=redefined-outer-name
         """Create any missing parent directories, make new DCCT directory, raw data subdirectories"""
-        report_path = f"./Test_Data/DCCT_{dcct_sn}-{dir_time_formatted}/DCCT_{dcct_sn}_Report.pdf"  # noqa: E501 # pylint: disable=redefined-outer-name
+        report_path = f"./Test_Data/DCCT_{dcct_sn}_Report.pdf"  # noqa: E501 # pylint: disable=redefined-outer-name
         raw_data_path = f"./Test_Data/DCCT_{dcct_sn}-{dir_time_formatted}/raw_data"  \
             # pylint: disable=redefined-outer-name
 

@@ -65,18 +65,18 @@ def get_current_datetime():
 def create_test_directories(dcct_sn, dir_time_formatted):
     """Create any missing parent directories, make new DCCT directory, raw
     data subdirectories"""
-    # Define paths
-    report_path = os.path.join("Test_Data", f"DCCT_{dcct_sn}-"
-                               f"{dir_time_formatted}",
-                               f"DCCT_{dcct_sn}_Report.pdf")
+
+    # PDF goes directly into the Test_Data master folder
+    report_path = os.path.join(".", "Test_Data", f"DCCT_{dcct_sn}_{dir_time_formatted}_Report.pdf")
+
+    # Raw data stays in its specific run folder
     raw_data_path = f"./Test_Data/DCCT_{dcct_sn}-{dir_time_formatted}/raw_data"
 
-    # Create parent directories for report and raw data paths (not including
-    # the file name)
+    # Create the master Test_Data directory if it doesn't exist
     report_dir = os.path.dirname(report_path)
     os.makedirs(report_dir, exist_ok=True)
 
-    # Create the raw_data directory
+    # Create the raw_data subdirectories
     os.makedirs(raw_data_path, exist_ok=True)
 
     return report_path, raw_data_path

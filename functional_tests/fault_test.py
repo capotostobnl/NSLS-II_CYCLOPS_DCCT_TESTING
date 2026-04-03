@@ -128,7 +128,7 @@ class FLT12_Fault_Test:
         flt12_positive_assert_pin_voltage = round(self.dmm.meas_dcv(), 4)  # Create a valid initial \
         # value for the while loop...
         self.gen.apply_pulse("1", self.GEN_TEST_FREQ, "0.005", self.GEN_TEST_VOLTAGE_NEG, "0")
-        self.psu.set_voltage("3", "10")  # Drop PSU N15V to 10V to expedite testing...
+        self.psu.set_voltage("3", "6")  # Drop PSU N15V to 10V to expedite testing...
         sleep(1)
         N15V_setpoint = self.psu.measure_voltage("3")
         psu_rb = N15V_setpoint  # Initialize psu_rb before the loop print statements...
@@ -143,7 +143,7 @@ class FLT12_Fault_Test:
                   f"FLT12 Fault Status Voltage:{np.round(flt12_positive_assert_pin_voltage, 3)} \n"
                   f"FLT12 Fault Status Flag: {self.flt12_flag}")
             # input(f"pre-sp increase... 249....{N15V_setpoint}")
-            N15V_setpoint += 0.250
+            N15V_setpoint += 1
             # input(f"Post-sp increase...{N15V_setpoint}")
             psu_rb = self.psu.measure_voltage("3")
             sleep(1)
@@ -200,7 +200,7 @@ class FLT12_Fault_Test:
         sleep(1)
         flt12_negative_assert_pin_voltage = round(self.dmm.meas_dcv(), 4)  # Create a valid initial \
         # value for the while loop...
-        self.psu.set_voltage("3", "10")  # Drop PSU N15V to 10V to expedite testing...
+        self.psu.set_voltage("3", "6")  # Drop PSU N15V to 10V to expedite testing...
         sleep(1)
         N15V_setpoint = self.psu.measure_voltage("3")
         psu_rb = N15V_setpoint  # Initialize psu_rb before the loop print statements...
@@ -214,7 +214,7 @@ class FLT12_Fault_Test:
                   f"FLT12 Fault Status Voltage:{np.round(flt12_negative_assert_pin_voltage, 3)} \n"
                   f"FLT12 Fault Status Flag: {flt12_flag}")
             # input(f"pre-sp increase... 249....{N15V_setpoint}")
-            N15V_setpoint += 0.250
+            N15V_setpoint += 1
             # input(f"Post-sp increase...{N15V_setpoint}")
             psu_rb = self.psu.measure_voltage("3")
             sleep(1)

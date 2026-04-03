@@ -1,0 +1,2 @@
+test_passed,positive_assertion_test,deassertion_test,initial_voltage,positive_assert_pin_voltage,positive_assert_ps_voltage,negative_assertion_test,negative_assert_pin_voltage,negative_assert_ps_voltage,test_current
+True,True,True,14.8745,0.0,-2.9989,True,0.0,-3.0007,1

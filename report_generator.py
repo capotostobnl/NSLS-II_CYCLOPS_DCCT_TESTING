@@ -95,8 +95,6 @@ def plot_pdf(dut_info, report_path, plot_path):
          dut_info["flt12_positive_signal_voltage_l"])
     flt12_negative_signal_voltage = float(
          dut_info["flt12_negative_signal_voltage_l"])
-    # Dictionary containing test names, values, and pass/fail results
-    # print(dut_info)
 
     flt12_tests_results = {
         "FLT12 Overall Testing": dut_info['flt12_test_passed_l'],
@@ -116,7 +114,6 @@ def plot_pdf(dut_info, report_path, plot_path):
     degree_sign = '\N{DEGREE SIGN}'
     freq_phase = f"{dut_info['current_test_frequency']} Hz, {dut_info['current_test_phase_shift']}{degree_sign}"
     current_tests_results = {
-        # "Current Overall Testing": ,
         "CT Measurement Overall Testing": (dut_info['current_test_freq_phase_pass'] 
                                            and dut_info['current_test_ch1_threshold']
                                            and dut_info['current_test_ch3_threshold']),
@@ -155,12 +152,7 @@ def plot_pdf(dut_info, report_path, plot_path):
 
 #############################################################################
 
-
-
-
-
-
-# Add space before the table title
+    # Add space before the table title
     Story.append(Spacer(1, 18))
 
     # Add the table title
@@ -232,20 +224,6 @@ def plot_pdf(dut_info, report_path, plot_path):
 # ******Add Current Test Tables******
 #############################################################################
 
-    degree_sign = '\N{DEGREE SIGN}'
-    freq_phase = f"{dut_info['current_test_frequency']} Hz, {dut_info['current_test_phase_shift']}{degree_sign}"
-    current_tests_results = {
-        # "Current Overall Testing": ,
-        "CT Measurement Overall Testing": (dut_info['current_test_freq_phase_pass'] 
-                                           and dut_info['current_test_ch1_threshold']
-                                           and dut_info['current_test_ch2_threshold']
-                                           and dut_info['current_test_ch3_threshold']),
-        "Channel 1 Voltage Threshold": (f"{dut_info['current_test_vpp1']}Vpp", dut_info['current_test_ch1_threshold']),
-        "Channel 2 Voltage Threshold": (f"{dut_info['current_test_vpp2']}Vpp", dut_info['current_test_ch2_threshold']),
-        "Channel 3 Voltage Threshold": (f"{dut_info['current_test_vpp3']}Vpp", dut_info['current_test_ch3_threshold']),
-        "Frequency and Phase": (freq_phase, dut_info['current_test_freq_phase_pass']),
-    }
-
     # Add space before the table title
     Story.append(Spacer(1, 18))
 
@@ -284,10 +262,6 @@ def plot_pdf(dut_info, report_path, plot_path):
         ('FONTSIZE', (0, 0), (-1, -1), 10),  # Font size
         ('BACKGROUND', (1, 1), (-1, -1), colors.white),  # Default row bg
     ]))
-
-    # Define colors with transparency
-    red = Color(1, 0, 0, alpha=0.5)  # Red (Fail)
-    green = Color(0, 1, 0, alpha=0.5)  # Green (Pass)
 
     # Apply row colors based on Pass/Fail status
     for row_idx, row in enumerate(current_data[1:], start=1):  # Skip header
@@ -351,8 +325,15 @@ if __name__ == "__main__":
         "flt12_positive_psu_voltage_l": -6,
         "flt12_negative_psu_voltage_l": -5,
         "dcct_sn_raw": "DCCT-M-B-0011-70000000006-BZ20130002-HBA20030148 \
-                       -22211030016-BZ22020423-HBA22170043-CTP-6303-50-A"
-
+                       -22211030016-BZ22020423-HBA22170043-CTP-6303-50-A",
+        "flt12_test_current": 1,
+        "current_test_ch1_threshold": True,
+        "current_test_ch3_threshold": True,
+        "current_test_frequency": 10.0,
+        "current_test_phase_shift": 180.0,
+        "current_test_freq_phase_pass": True,
+        "current_test_vpp1": 0.52,
+        "current_test_vpp3": 21.0
         }
 
     report_path_l = "sample_test_report.pdf"

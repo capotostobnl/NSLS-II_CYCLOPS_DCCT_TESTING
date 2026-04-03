@@ -23,11 +23,11 @@ MIN_PK_PK = 0.5  # Minimum measured PK-to-PK Voltage
 
 def init_plots():
     """Initialize plots"""
-    # Create a plot figure with 4 plots, for CHA, CHB, CHC, CH AB.
-    f, ax = plt.subplots(1, 3)
-    f.set_figheight(6)
-    f.set_figwidth(18)
-    f.suptitle("ALSu DCCT Test Data")
+    # Create a plot figure with 3 plots, for CH1, CH3, and Phase Shift.
+    f, ax = plt.subplots(3, 1)
+    f.set_figheight(8)
+    f.set_figwidth(12)
+    f.suptitle("NSLS-II DCCT Test Data")
     return f, ax
 
 
@@ -42,7 +42,6 @@ def calculate_frequency(volts):
 
     fs = 2000
     N = len(volts[1])  # Number of samples # pylint: disable=C0103
-    # dt = scope_time[1] - scope_time[0]  # Time interval between samples
     dt = 1 / fs
     # Perform the Fast Fourier Transform (FFT) on the signal
     # (assuming volts[1] is the waveform of interest)
@@ -63,20 +62,17 @@ def calculate_frequency(volts):
 
 
 def calculate_phase_shift(volts):
-    """Calculate the phase shift between CH1 and CH2 Waveforms using FFT"""
+    """Calculate the phase shift between CH1 and CH3 Waveforms using FFT"""
     # Calculate the frequency of the signal using FFT
     frequency = calculate_frequency(volts)
 
-    # Perform FFT on both Channel 1 and Channel 2 signals
+    # Perform FFT on both Channel 1 and channel 3 signals
     fft_ch1 = np.fft.fft(volts[1])
     fft_ch3 = np.fft.fft(volts[3])
 
     # Get the index corresponding to the peak frequency
     # (same frequency for both channels)
     N = len(volts[1])  # pylint: disable=C0103
-    # dt = scope_time[1] - scope_time[0]
-    # freqs = np.fft.fftfreq(N, dt)
-    # positive_freqs = freqs[:N // 2]
 
     # Find the index of the peak frequency
     peak_freq_idx = np.argmax(np.abs(fft_ch1[:N // 2]))
@@ -88,7 +84,7 @@ def calculate_phase_shift(volts):
 
     # Calculate the phase shift in degrees
     phase_shift = np.degrees(phase_ch3 - phase_ch1)  # Phase shift between
-    # Channel 2 and Channel 1
+    # channel 3 and Channel 1
     if phase_shift < 0:
         phase_shift += 360  # Ensure phase is
         # positive and in the range [0, 360)
@@ -103,7 +99,7 @@ def unpack_raw_adc(channel_data, decoded_wfdata):
     ymax = {}
     ymin = {}
 
-    for i in (1, 3):  # Loop over channels 1 to 4
+    for i in (1, 3):  # Loop over channels 1 and 3
         adc_wave = np.array(unpack(f"{len(decoded_wfdata[i]['adc_wave'])}B",
                                    decoded_wfdata[i]['adc_wave']))
 
@@ -118,7 +114,7 @@ def unpack_raw_adc(channel_data, decoded_wfdata):
 
 
 def plot_waveforms(channel_data, decoded_wfdata, plot_filename):
-    """Generate four plots with waveforms and additional info."""
+    """Generate three plots with waveforms and additional info."""
     # Initialize all return variables
     ch1_threshold = ch3_threshold = False
     freq_phase_pass = False
@@ -160,32 +156,32 @@ def plot_waveforms(channel_data, decoded_wfdata, plot_filename):
         ax[1].set_facecolor((1, 0, 0, 0.2))  # Red with 50% alpha
         ch3_threshold = False
 
-    # Calculate Phase Shift between Channel 1 and Channel 2
+    # Calculate Phase Shift between Channel 1 and channel 3
     frequency, phase_shift = calculate_phase_shift(volts)
 
-    # Plot Channel 1 and Channel 2 (Phase Shift)
-    ax[1, 1].plot(scope_time, volts[1], label="Channel 1")
-    ax[1, 1].plot(scope_time, volts[2], label="Channel 2")
-    ax[1, 1].set_title("Channel 1 & Channel 2 (IOUT 1 and IOUT 2) Phase Shift")
-    ax[1, 1].grid(True)
+    # Plot Channel 1 and channel 3 (Phase Shift)
+    ax[2].plot(scope_time, volts[1], label="Channel 1")
+    ax[2].plot(scope_time, volts[3], label="Channel 3")
+    ax[2].set_title("Channel 1 & Channel 3 Phase Shift")
+    ax[2].grid(True)
     phase_shift = round(phase_shift, 2)
     frequency = round(frequency, 2)
-    ax[1, 1].text(0.05, 0.9, f"Phase Shift: {phase_shift}°\nFrequency:"
-                  f"{frequency} Hz",
-                  transform=ax[1, 1].transAxes, fontsize=14, verticalalignment='top',
-                  bbox={'facecolor': 'wheat', 'alpha': 0.7})
+    ax[2].text(0.05, 0.9, f"Phase Shift: {phase_shift}°\nFrequency: {frequency} Hz",
+               transform=ax[2].transAxes, fontsize=14, verticalalignment='top',
+               bbox={'facecolor': 'wheat', 'alpha': 0.7})
     if 9 <= frequency <= 11 and 178 <= phase_shift <= 181:   # Set Pass/Fail Tolerance
-        ax[1, 1].set_facecolor((0, 1, 0, 0.2))  # Green with 50% alpha
+        ax[2].set_facecolor((0, 1, 0, 0.2))  # Green with 50% alpha
         freq_phase_pass = True
     else:
-        ax[1, 1].set_facecolor((1, 0, 0, 0.2))  # Red with 50% alpha
+        ax[2].set_facecolor((1, 0, 0, 0.2))  # Red with 50% alpha
         freq_phase_pass = False
 
     f.savefig(plot_filename, bbox_inches='tight')
     # Saves the figure with tight bounding box
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
+    plt.close(f)
     return plot_filename, ch1_threshold, ch3_threshold, \
         frequency, phase_shift, freq_phase_pass, vpp1, vpp3
 
@@ -207,31 +203,23 @@ if __name__ == "__main__":
 
     # Generate 10 Hz, 1V peak-to-peak sine waves
     sine_wave_1 = 0.5 * np.sin(2 * np.pi * 10 * t)  # CH1: 10Hz, 1Vpp (0.5V amplitude)
-    sine_wave_2 = -sine_wave_1  # CH2: 180-degree phase shift (inverted CH1)
-    sine_wave_3 = sine_wave_1  # CH3: Same as CH1 (no shift)
+    sine_wave_3 = -sine_wave_1  # CH3: 180-degree shift
 
     # Simulated ADC conversion (assuming 8-bit unsigned ADC, 0-255 range)
     adc_max = 255  # pylint: disable=C0103
     sine_wave_1_adc = ((sine_wave_1 + 0.5) * adc_max).astype(np.uint8)
-    sine_wave_2_adc = ((sine_wave_2 + 0.5) * adc_max).astype(np.uint8)
     sine_wave_3_adc = ((sine_wave_3 + 0.5) * adc_max).astype(np.uint8)
 
     # Test channel data (simulate oscilloscope scaling factors)
     test_channel_data = {
         1: {"yoff": 128, "ymult": 1 / 255, "yzero": 0, "xincr": 1 / fs_l},
-        2: {"yoff": 128, "ymult": 1 / 255, "yzero": 0, "xincr": 1 / fs_l},
         3: {"yoff": 128, "ymult": 1 / 255, "yzero": 0, "xincr": 1 / fs_l},
     }
 
     # Encapsulating ADC waveforms in a format similar to real oscilloscope data
     test_decoded_wfdata = {
         1: {"headerlen": 2, "header": b"\x00\x01", "adc_wave": sine_wave_1_adc.tobytes()},
-        2: {"headerlen": 2, "header": b"\x00\x01", "adc_wave": sine_wave_2_adc.tobytes()},
         3: {"headerlen": 2, "header": b"\x00\x01", "adc_wave": sine_wave_3_adc.tobytes()},
     }
 
-    plot_waveforms(test_channel_data, test_decoded_wfdata, plot_filename_l)  # Now works correctly!
-
-    input()
-
-    plot_waveforms(test_channel_data, test_decoded_wfdata, plot_filename_l)  # Now works correctly!
+    plot_waveforms(test_channel_data, test_decoded_wfdata, plot_filename_l)
